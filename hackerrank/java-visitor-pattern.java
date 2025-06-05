@@ -177,3 +177,55 @@ class Solution{
 		System.out.println(res3);
 	}
 }
+
+Shorter version of the code
+
+import java.util.*;
+
+class SumInLeavesVisitor extends TreeVis {
+    int result = 0;
+    public int getResult() { return result; }
+    public void visitNode(TreeNode node) {}
+    public void visitLeaf(TreeLeaf leaf) { result += leaf.getValue(); }
+}
+
+class ProductOfRedNodesVisitor extends TreeVis {
+    long result = 1;
+    public int getResult() { return (int) result; }
+    public void visitNode(TreeNode node) { if (node.getColor() == Color.RED) result = result * node.getValue() % 1000000007; }
+    public void visitLeaf(TreeLeaf leaf) { if (leaf.getColor() == Color.RED) result = result * leaf.getValue() % 1000000007; }
+}
+
+class FancyVisitor extends TreeVis {
+    int even = 0, green = 0;
+    public int getResult() { return Math.abs(even - green); }
+    public void visitNode(TreeNode node) { if (node.getDepth() % 2 == 0) even += node.getValue(); }
+    public void visitLeaf(TreeLeaf leaf) { if (leaf.getColor() == Color.GREEN) green += leaf.getValue(); }
+}
+
+public class Solution {
+    static HashMap<Integer, HashSet<Integer>> adj = new HashMap<>();
+    static int[] val; static Color[] col;
+    
+    static Tree solve() {
+        Scanner sc = new Scanner(System.in);
+        int n = sc.nextInt(); val = new int[n]; col = new Color[n];
+        for (int i = 0; i < n; i++) val[i] = sc.nextInt();
+        for (int i = 0; i < n; i++) col[i] = sc.nextInt() == 0 ? Color.RED : Color.GREEN;
+        for (int i = 0; i < n; i++) adj.put(i, new HashSet<>());
+        for (int i = 0; i < n - 1; i++) { int u = sc.nextInt() - 1, v = sc.nextInt() - 1; adj.get(u).add(v); adj.get(v).add(u); }
+        return build(0, -1, 0);
+    }
+    
+    static Tree build(int node, int parent, int depth) {
+        HashSet<Integer> children = new HashSet<>(adj.get(node)); if (parent != -1) children.remove(parent);
+        if (children.isEmpty()) return new TreeLeaf(val[node], col[node], depth);
+        ArrayList<Tree> childTrees = new ArrayList<>(); for (int child : children) childTrees.add(build(child, node, depth + 1));
+        return new TreeNode(val[node], col[node], depth, childTrees);
+    }
+    
+    public static void main(String[] args) {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+    }
+}
+
